@@ -1,3 +1,5 @@
-const db = require("monk")("localhost:27017/tokoSlametAttendance");
+const db = require("monk")(
+  process.env.MONGODB_URI || "localhost:27017/tokoSlametAttendance"
+);
 
 exports.employees = db.get("employees");

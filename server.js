@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const schedule = require("node-schedule");
 const port = process.env.PORT || 4009;
+const { test } = require("./dbConfig/");
 
 let test = 1;
 
@@ -30,7 +31,15 @@ app.use("/time", (req, res) => {
 });
 
 const execute = schedule.scheduleJob({ second: 20 }, () => {
-  console.log("asd");
+  test.find({}).then((doc) => {
+    if (doc.length > 0) {
+      const { minutesRun, _id } = doc[0];
+
+      test.update({ _id }, { $set: { minutesRun: minutesRun + 1 } });
+    } else {
+      test.insert({ minutesRun: 1 });
+    }
+  });
   test += 1;
 });
 

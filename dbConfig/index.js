@@ -3,3 +3,5 @@ const db = require("monk")(
 );
 
 exports.employees = db.get("employees");
+exports.attendance = db.get("attendance");
+exports.test = db.get("test");

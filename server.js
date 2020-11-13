@@ -14,7 +14,11 @@ app.use(express.json());
 const EmployeeRouter = require("./routes/employees");
 
 app.use("/time", (req, res) => {
-  const today = new Date();
+  const jakarta = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Jakarta",
+  });
+  const today = new Date(jakarta);
+
   const date = today.getDate();
   const month = today.getMonth();
   const year = today.getFullYear();

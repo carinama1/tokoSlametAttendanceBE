@@ -4,7 +4,7 @@ const schedule = require("node-schedule");
 const port = process.env.PORT || 4009;
 const { test } = require("./dbConfig/");
 
-let test = 1;
+let test1 = 1;
 
 const app = express();
 
@@ -40,12 +40,12 @@ const execute = schedule.scheduleJob({ second: 20 }, () => {
       test.insert({ minutesRun: 1 });
     }
   });
-  test += 1;
+  test1 += 1;
 });
 
 app.use("/api/v1/employees", EmployeeRouter);
 app.use("/", (req, res) => {
-  res.send({ message: test });
+  res.send({ message: test1 });
 });
 
 app.listen(port, () => {

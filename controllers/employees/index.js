@@ -19,7 +19,7 @@ exports.insertEmployee = (req, res) => {
     } else {
       const created = new Date();
       employees
-        .insert({ name, payday, phone, role, created })
+        .insert({ name, payday, phone, role, created, months: 0 })
         .then((doc) => {
           res.status(201).send(`${name} berhasil didaftarkan`);
         })

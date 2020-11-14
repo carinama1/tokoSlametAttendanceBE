@@ -89,7 +89,9 @@ const generateAttendance = () => {
 };
 
 const execute = schedule.scheduleJob({ second: 1 }, () => {
-  generateAttendance();
+  if (process.env.PRODUCTION) {
+    generateAttendance();
+  }
   test.find({}).then((doc) => {
     if (doc.length > 0) {
       const { minutesRun, _id } = doc[0];

@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const schedule = require("node-schedule");
+const schedule = require("node-cron");
 const port = process.env.PORT || 4009;
 const { test, employees, attendance } = require("./dbConfig/");
 
@@ -13,6 +13,7 @@ app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 
 const EmployeeRouter = require("./routes/employees");
+const AttendanceRouter = require("./routes/attendance");
 
 app.use("/time", (req, res) => {
   const jakarta = new Date().toLocaleString("en-US", {
@@ -88,23 +89,42 @@ const generateAttendance = () => {
   });
 };
 
-const execute = schedule.scheduleJob({ second: 1 }, () => {
-  if (process.env.PRODUCTION) {
-    generateAttendance();
-  }
-  test.find({}).then((doc) => {
-    if (doc.length > 0) {
-      const { minutesRun, _id } = doc[0];
+const execute = schedule.schedule(
+  "0 0 * * *",
+  () => {
+    const jakarta = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Jakarta",
+    });
+    const today = new Date(jakarta);
 
-      test.update({ _id }, { $set: { minutesRun: minutesRun + 1 } });
-    } else {
-      test.insert({ minutesRun: 1 });
-    }
-  });
-  test1 += 1;
-});
+    const date = today.getDate();
+    const month = today.getMonth();
+    const year = today.getFullYear();
+    const hour = today.getHours();
+    const minutes = today.getMinutes();
+    const day = today.getDay();
+
+    console.log({ date, month, year, day, hour, minutes });
+    // if (!process.env.PRODUCTION) {
+    generateAttendance();
+    // }
+    test.find({}).then((doc) => {
+      if (doc.length > 0) {
+        const { minutesRun, _id } = doc[0];
+
+        test.update({ _id }, { $set: { minutesRun: minutesRun + 1 } });
+      } else {
+        test.insert({ minutesRun: 1 });
+      }
+    });
+    test1 += 1;
+  },
+  { scheduled: true, timezone: "Asia/Jakarta" }
+);
 
 app.use("/api/v1/employees", EmployeeRouter);
+app.use("/api/v1/attendance", AttendanceRouter);
+
 app.use("/", (req, res) => {
   res.send({ message: test1 });
 });

@@ -1,4 +1,4 @@
-const { employees } = require("../../dbConfig");
+const { employees, attendance } = require("../../dbConfig");
 
 // /api/v1/employees/get
 exports.getEmployees = (req, res) => {
@@ -21,6 +21,21 @@ exports.insertEmployee = (req, res) => {
       employees
         .insert({ name, payday, phone, role, created, months: 0 })
         .then((doc) => {
+          const jakarta = new Date().toLocaleString("en-US", {
+            timeZone: "Asia/Jakarta",
+          });
+          const today = new Date(jakarta);
+          const month = today.getMonth();
+
+          const { months, _id } = doc;
+          attendance.insert({
+            employeeID: _id,
+            absent: 0,
+            months,
+            currentMonth: month,
+            day: 1,
+            attendanceHistory: [],
+          });
           res.status(201).send(`${name} berhasil didaftarkan`);
         })
         .catch((err) => {
